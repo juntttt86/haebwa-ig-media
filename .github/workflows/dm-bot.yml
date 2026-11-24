@@ -4,13 +4,22 @@ on:
     - cron: "*/10 * * * *"
   workflow_dispatch:
 concurrency: dm-bot
+permissions:
+  contents: write
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - run: python3 bot/dm_bot.py
+      - name: 예약 게시
+        run: python3 bot/post_queue.py
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          IG_ID: ${{ secrets.IG_ID }}
+      - name: 댓글 DM
+        if: always()
+        run: python3 bot/dm_bot.py
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
           IG_ID: ${{ secrets.IG_ID }}
