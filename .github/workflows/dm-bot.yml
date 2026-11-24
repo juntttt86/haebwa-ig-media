@@ -1,0 +1,16 @@
+name: dm-bot
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+concurrency: dm-bot
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 bot/dm_bot.py
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          IG_ID: ${{ secrets.IG_ID }}
