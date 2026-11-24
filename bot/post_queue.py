@@ -54,8 +54,16 @@ def post(item):
             ready(k)
         c = call("POST", f"/{ME}/media", media_type="CAROUSEL", children=",".join(kids), caption=item["caption"])["id"]
     else:
-        c = call("POST", f"/{ME}/media", media_type="REELS", video_url=item["video"], cover_url=item["cover"],
-                 caption=item["caption"], share_to_feed="false")["id"]
+        args = dict(media_type="REELS", video_url=item["video"], cover_url=item["cover"],
+                    caption=item["caption"], share_to_feed="false")
+        if item.get("ai_audio"):          # AI 음성 → Meta 'AI 정보' 표시
+            try:
+                c = call("POST", f"/{ME}/media", **args, is_ai_generated="true")["id"]
+            except RuntimeError as e:     # 이 계정·버전에서 지원 안 되면 표시 없이(캡션에 AI 음성 안내가 있음)
+                print("AI 표시 실패 → 표시 없이 진행:", str(e)[:200])
+                c = call("POST", f"/{ME}/media", **args)["id"]
+        else:
+            c = call("POST", f"/{ME}/media", **args)["id"]
     ready(c)
     mid = call("POST", f"/{ME}/media_publish", creation_id=c)["id"]
     return call("GET", f"/{mid}", fields="permalink,timestamp") | {"id": mid}
