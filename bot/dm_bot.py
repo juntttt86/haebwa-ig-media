@@ -42,11 +42,9 @@ def call(method, path, **params):
 
 
 def card(slug, d):
-    note = "쿠팡 파트너스 링크(구매 시 수수료를 받아요)"
-    if d.get("dm_note"):
-        note = d["dm_note"][:30] + " · " + note
+    note = "[광고] 쿠팡 파트너스 활동으로 수수료를 받아요"   # 잘려도 대가성 문구가 남게 맨 앞
     els = [{"title": f"{p['tag']} {p['brand']} {p['price']}"[:80],
-            "subtitle": f"{p['for']} · {note}"[:80],
+            "subtitle": (f"{note} · {d['dm_note']}" if d.get("dm_note") else f"{note} · {p['for']}")[:80],
             "image_url": f"{PAGES}/{urllib.parse.quote(slug)}/product-{p['tag']}.jpg",
             "buttons": [{"type": "web_url", "url": p["link"], "title": "쿠팡에서 보기"},
                         {"type": "web_url", "url": d["blog_url"], "title": "전체 비교 글"}]}
