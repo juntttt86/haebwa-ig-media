@@ -56,6 +56,8 @@ def main():
     posts = {}
     for f in ROOT.glob("*/dm.json"):
         d = json.loads(f.read_text(encoding="utf-8"))
+        if not str(d.get("blog_url") or "").startswith("http"):   # 블로그 발행 전({BLOG_URL}) — 빈 값이 모든 캡션에 걸리지 않게
+            continue
         posts[d["blog_url"]] = (f.parent.name, d)
     now = dt.datetime.now(dt.timezone.utc)
     sent = 0

@@ -21,6 +21,51 @@ Q, DONE = ROOT / "queue", ROOT / "queue" / "done"
 API = "https://graph.facebook.com/v21.0"
 TOKEN, ME = os.environ["IG_TOKEN"], os.environ["IG_ID"]
 KST = dt.timezone(dt.timedelta(hours=9))
+RSS = "https://rss.blog.naver.com/juntttt.xml"
+PH = "{BLOG_URL}"   # 블로그 글이 아직 예약 상태일 때 캡션·dm.json에 넣는 자리(2026-11-26 PS5부터)
+
+
+def blog_url_for(key):
+    """네이버 블로그 RSS에서 제목에 key(예: '3종비교 #17')가 든 발행 글 주소를 찾는다. 없으면 None."""
+    import re
+    import xml.etree.ElementTree as ET
+    try:
+        with urllib.request.urlopen(urllib.request.Request(RSS, headers={"User-Agent": "Mozilla/5.0"}), timeout=30) as r:
+            root = ET.fromstring(r.read())
+    except Exception as e:
+        print("RSS 실패:", str(e)[:120])
+        return None
+    for it in root.iter("item"):
+        if key in (it.findtext("title") or ""):
+            m = re.search(r"blog\.naver\.com/juntttt/(\d+)", it.findtext("link") or it.findtext("guid") or "")
+            if m:
+                return f"https://blog.naver.com/juntttt/{m.group(1)}"
+    return None
+
+
+def fill_blog_url(f, item):
+    """캡션에 PH가 있으면 발행된 블로그 주소로 바꾸고 dm.json도 고친다. 아직 발행 전이면 False(다음 실행에 다시)."""
+    if PH not in item["caption"]:
+        return True
+    url = blog_url_for(item.get("blog_title_key") or "")
+    if not item.get("blog_title_key") or not url:
+        print("블로그 글 발행 대기:", f.name, item.get("blog_title_key"))
+        return False
+    item["caption"] = item["caption"].replace(PH, url)
+    f.write_text(json.dumps(item, ensure_ascii=False, indent=1), encoding="utf-8")
+    dmj = ROOT / item["slug"] / "dm.json"
+    if dmj.exists():
+        d = json.loads(dmj.read_text(encoding="utf-8"))
+        if d.get("blog_url") in (PH, "", None):
+            d["blog_url"] = url
+            dmj.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
+    for g in Q.glob(f"*{item['slug']}.json"):   # 같은 글의 다른 예약(캐러셀 등)도 같이
+        o = json.loads(g.read_text(encoding="utf-8"))
+        if PH in o["caption"]:
+            o["caption"] = o["caption"].replace(PH, url)
+            g.write_text(json.dumps(o, ensure_ascii=False, indent=1), encoding="utf-8")
+    print("블로그 주소 채움:", url)
+    return True
 
 
 def call(method, path, **p):
@@ -76,6 +121,9 @@ def main():
         item = json.loads(f.read_text(encoding="utf-8"))
         if dt.datetime.strptime(item["at"], "%Y-%m-%d %H:%M").replace(tzinfo=KST) > now:
             continue
+        if not fill_blog_url(f, item):
+            continue
+        changed = True
         try:
             item["result"] = post(item)
             DONE.mkdir(exist_ok=True)
@@ -96,7 +144,7 @@ def main():
     if changed:
         subprocess.run(["git", "config", "user.name", "haebwa-bot"], check=True)
         subprocess.run(["git", "config", "user.email", "haebwa-bot@users.noreply.github.com"], check=True)
-        subprocess.run(["git", "add", "-A", "queue"], check=True)
+        subprocess.run(["git", "add", "-A", "queue", "*/dm.json"], check=True)
         subprocess.run(["git", "commit", "-qm", "예약 게시 처리"], check=True)
         subprocess.run(["git", "push", "-q"], check=True)
 
