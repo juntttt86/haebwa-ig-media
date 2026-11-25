@@ -1,0 +1,29 @@
+{
+ "dm_keyword": "플스",
+ "blog_url": "{BLOG_URL}",
+ "dm_note": "세 상품 모두 입점 판매자 상품이라 가격·재고는 수시로 바뀌어요",
+ "manychat_media": [],
+ "products": [
+  {
+   "tag": "A",
+   "brand": "PS5 슬림",
+   "price": "1,298,000원",
+   "for": "GTA6 하려고 PS5를 산다면",
+   "link": "https://link.coupang.com/a/iYxBrKw8IK"
+  },
+  {
+   "tag": "B",
+   "brand": "PS5 프로",
+   "price": "2,120,600원",
+   "for": "화질·저장공간을 끝까지",
+   "link": "https://link.coupang.com/a/iYxBrQAfyS"
+  },
+  {
+   "tag": "C",
+   "brand": "엑스박스",
+   "price": "1,479,000원",
+   "for": "엑스박스로도 GTA6를 한다면",
+   "link": "https://link.coupang.com/a/iYxBrVDIfA"
+  }
+ ]
+}
