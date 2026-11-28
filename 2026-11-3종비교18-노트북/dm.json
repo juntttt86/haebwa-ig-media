@@ -1,0 +1,29 @@
+{
+ "dm_keyword": "노트북",
+ "blog_url": "https://blog.naver.com/juntttt/224492397393",
+ "dm_note": "스냅드래곤(ARM) 노트북은 일부 프로그램이 안 돌 수 있어요. 학교·회사 보안 프로그램, 게임은 미리 확인하세요",
+ "manychat_media": [],
+ "products": [
+  {
+   "tag": "A",
+   "brand": "삼성",
+   "price": "1,060,000원",
+   "for": "가볍게 들고 다니고 배터리 오래",
+   "link": "https://link.coupang.com/a/i2LXRsHVtY"
+  },
+  {
+   "tag": "B",
+   "brand": "HP",
+   "price": "1,199,000원",
+   "for": "메모리·저장공간 넉넉하게",
+   "link": "https://link.coupang.com/a/i2LXRzW4J2"
+  },
+  {
+   "tag": "C",
+   "brand": "LG",
+   "price": "925,500원",
+   "for": "싸게 사서 나중에 늘리기",
+   "link": "https://link.coupang.com/a/i2LXRHdx24"
+  }
+ ]
+}
